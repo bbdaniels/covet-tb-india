@@ -12,6 +12,8 @@ ieboilstart, v(16.1) adopath("${dir}/ado" , strict)
   net from https://github.com/bbdaniels/stata/raw/main/
     net install labelcollapse
     net install betterbar
+    net install sumstats
+    net install outwrite
 
 // Graph scheming
 
@@ -49,7 +51,9 @@ ieboilstart, v(16.1) adopath("${dir}/ado" , strict)
       , save sign reset replace
 
 // Run sub-files
-
-
+-
+  do "${dir}/do/makedata.do"
+  do "${dir}/do/figures.do"
+  do "${dir}/do/tables.do"
 
 //

@@ -24,6 +24,9 @@ use "${dir}/data/constructed/sp-combined.dta" ///
     lab var checklist "Checklist"
 
   merge m:1 city fidcode using `pre' , keep(1 3) nogen
+    egen uid = group(city fidcode)
+    lab var uid "Unique Facility ID"
+    drop fidcode
 
   egen cov_screen = rowmax(cov_*)
     lab var cov_screen "Covid Screening"
