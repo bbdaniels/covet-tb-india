@@ -23,7 +23,23 @@ use "${dir}/data/constructed/sp-combined.dta" ///
   egen checklist = rowmean(sp?_h_*)
     lab var checklist "Checklist"
 
-  merge m:1 city fidcode using `pre' , keep(1 3)
+  merge m:1 city fidcode using `pre' , keep(1 3) nogen
+
+  egen cov_screen = rowmax(cov_*)
+    lab var cov_screen "Covid Screening"
+
+  lab var med_anti_any_3 "Antibiotics"
+  lab var correct "Correct"
+
+  ren ppe_9 mask
+    gen mask_hi = mask > 2
+    lab var mask_hi "Surgical/N95"
+  egen ppe = rowmax(ppe_*)
+    lab var ppe "Covid Safety"
+
+  egen test_cov = rowmax(test_cov*)
+    lab var test_cov "Covid Test"
+    lab val test_cov yesno
 
   iecodebook export ///
   using "${dir}/data/constructed/sp-covet.xlsx" ///

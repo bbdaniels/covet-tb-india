@@ -7,18 +7,24 @@ ieboilstart, v(16.1) adopath("${dir}/ado" , strict)
 // Install ado-files
 
   ssc install iefieldkit
+  net install grc1leg, from("http://www.stata.com/users/vwiggins")
 
   net from https://github.com/bbdaniels/stata/raw/main/
     net install labelcollapse
+    net install betterbar
 
 // Graph scheming
 
   copy "https://github.com/graykimbrough/uncluttered-stata-graphs/raw/master/schemes/scheme-uncluttered.scheme" ///
-    "${dir}/scheme-uncluttered.scheme" , replace
+    "${dir}/ado/scheme-uncluttered.scheme" , replace
 
-  sysdir set PERSONAL "${dir}/"
   set scheme uncluttered , perm
   graph set eps fontface "Helvetica"
+
+// Globals
+
+  global pct 0 "0%" .25 "25%" .5 "50%" .75 "75%" 1 "100%"
+  global hist_opts ylab(, format(%9.0f) angle(0) axis(2)) yscale(noline alt axis(2)) ytit("Frequency (Histogram)", axis(2)) ytit(, axis(1)) yscale(alt)
 
 // Get raw data
 
