@@ -49,7 +49,7 @@ outwrite `varlist' using "${dir}/output/regressions.xlsx" , replace col(`labels'
 // Table 4. Regression estimates
 use "${dir}/data/constructed/sp-covet.dta" , clear
 
-local varlist ppe ppe_* mask_hi
+local varlist ppe_* mask_hi
 
 foreach var of varlist  `varlist'  {
   reg `var' ///
@@ -59,7 +59,7 @@ foreach var of varlist  `varlist'  {
     local labels = `"`labels' "`:var lab `var''" "'
   }
 
-outwrite `varlist' using "${dir}/output/regressions.xlsx" , replace col(`labels') stats(N r2)
+outwrite `varlist' using "${dir}/output/regressions2.xlsx" , replace col(`labels') stats(N r2)
 
 
 
