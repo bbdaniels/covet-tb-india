@@ -14,6 +14,7 @@ ieboilstart, v(16.1) adopath("${dir}/ado" , strict)
     net install betterbar
     net install sumstats
     net install outwrite
+    net install forest
 
 // Graph scheming
 
@@ -26,6 +27,8 @@ ieboilstart, v(16.1) adopath("${dir}/ado" , strict)
 // Globals
 
   global pct 0 "0%" .25 "25%" .5 "50%" .75 "75%" 1 "100%"
+  global pct75 0 "0%" .25 "25%" .5 "50%" .75 "75%"
+  global pct20 0 "0%" .05 "5%" .1 "10%" .15 "15%" .2 "20%"
   global hist_opts ylab(, format(%9.0f) angle(0) axis(2)) yscale(noline alt axis(2)) ytit("Frequency (Histogram)", axis(2)) ytit(, axis(1)) yscale(alt)
 
 // Get raw data
