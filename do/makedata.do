@@ -32,7 +32,7 @@ use "${dir}/data/constructed/sp-combined.dta" ///
     lab var cov_screen "Covid Screening"
 
   lab var med_anti_any_3 "Antibiotics"
-  lab var correct "Correct"
+  lab var correct "TB Test or Refer"
 
   ren ppe_9 mask
     gen mask_hi = mask > 2

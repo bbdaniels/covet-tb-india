@@ -7,7 +7,7 @@ use "${dir}/data/constructed/sp-covet.dta" , clear
     correct test_cov test_cxr test_afb test_gx refer ///
     med_anti_any_3 med_anti_any_2 med_code_any_9 ///
   if city == 1 ///
-    , over(case) legend(on) xlab(${pct}) xoverhang title("Patna") barc(red gray) bar pct ///
+    , over(case) legend(on pos(12) region(lc(none))) xlab(${pct}) xoverhang title("Patna") barc(red gray) bar pct ///
       legend(order(1 "Standard TB Case" 2 "Covid-Like Case"))
 
   graph save "${dir}/output/temp/bar-patna.gph" , replace
@@ -24,166 +24,79 @@ use "${dir}/data/constructed/sp-covet.dta" , clear
     "${dir}/output/temp/bar-patna.gph" ///
     "${dir}/output/temp/bar-mumbai.gph"
 
-  graph export "${dir}/output/summary.pdf" , replace
+  graph export "${dir}/output/f1-summary.pdf" , replace
 
 // Figure 2
+use "${dir}/data/constructed/sp-covet.dta" , clear
 
+  lab def case 1 "Standard TB Case" 9 "Covid-Like Case" , replace
+
+  ren cov_screen screen
+    lab var screen "Any Screening"
+    lab var ppe "Any Safety"
+
+  betterbarci ///
+    ppe ppe_* mask_hi screen cov_* ///
+    , over(case) legend(on pos(12) region(lc(none))) xlab(${pct}) xoverhang ysize(7) ///
+      barc(red gray) bar pct scale(0.7)
+
+      graph export "${dir}/output/f2-summary.pdf" , replace
+
+
+// Figure 3
 use "${dir}/data/constructed/sp-covet.dta" , clear
 
   egen tag = tag(uid)
-  lab def case 1 "Standard TB" 9 "Covid-Like" , replace
+  lab def case 1 "Standard TB Case" 9 "Covid-Like Case" , replace
 
   tw ///
     (histogram pre_correct if tag == 1, frac yaxis(2) color(gs14) start(0) w(0.05) gap(10)) ///
-    (lowess correct   pre_correct  if city == 1 , lc(black) lw(thick)) ///
-    (lowess correct   pre_correct  if city == 2 , lc(blue)  lw(thick)) ///
-  , ${hist_opts} by(case , legend(off order(2 "Patna" 3 "Mumbai")) imargin(medium) note("")) xsize(10) ///
-    legend(off order(2 "Patna" 3 "Mumbai") pos(12) c(3) region(lc(none)) symxsize(medium)) ///
-    xlab(${pct}) xoverhang xtit("") ///
-    ylab(${pct}) ytit("TB Testing") yscale(noline) ylab(none, axis(2))
+    (lowess correct   pre_correct  if city == 1 , lc(black%50) lp(dash)) ///
+    (lowess correct   pre_correct  if city == 2 , lc(black%50) lp(dash)) ///
+    (lowess correct   pre_correct  , lc(black) lw(thick)) ///
+    (lowess test_cov  pre_correct  if city == 1 , lc(blue%50) lp(dash)) ///
+    (lowess test_cov  pre_correct  if city == 2 , lc(blue%50) lp(dash)) ///
+    (lowess test_cov  pre_correct   , lc(blue) lw(thick) ) ///
+  , ${hist_opts} by(case , ixaxes c(1) legend(on order(2 "Patna" 3 "Mumbai")) imargin(medium) note("")) ysize(7) ///
+    legend(off order(4 "TB Test or Refer" 3 "Cities Separate" 7 "Covid Test" 6 "Cities Separate") ///
+      pos(12) c(2) region(lc(none))) ///
+    xlab(.25 "25%" .5 "50%" .75 "75%" 1 "100%" 0 "Prior Quality {&rarr}") xoverhang ///
+    ylab(${pct}) ytit("") xtit("") yscale(noline) ylab(none, axis(2))
 
-    graph save "${dir}/output/temp/qual-tb.gph" , replace
+    graph export "${dir}/output/f3-testing.pdf" , replace
 
-
-  tw ///
-    (histogram pre_correct if tag == 1, frac yaxis(2) color(gs14) start(0) w(0.05) gap(10)) ///
-    (lowess test_cov  pre_correct  if city == 1 , lc(black) lw(thick)) ///
-    (lowess test_cov  pre_correct  if city == 2 , lc(blue)  lw(thick)) ///
-  , ${hist_opts} by(case, legend(off) imargin(medium) note("")) xsize(10) ///
-    legend(off pos(12) c(3) region(lc(none)) symxsize(medium)) ///
-    xlab(${pct}) xoverhang xtit("") ///
-    ylab(${pct25}) ytit("Covid Testing") yscale(noline) ylab(none, axis(2))
-
-    graph save "${dir}/output/temp/qual-co.gph" , replace
-
-    graph combine ///
-      "${dir}/output/temp/qual-tb.gph" ///
-      "${dir}/output/temp/qual-co.gph" ///
-      , c(1)
-    graph draw, ysize(5)
-
-  graph export "${dir}/output/quality.pdf" , replace
-
-// Figure 2
-
-  use "${dir}/data/constructed/sp-covet.dta" , clear
-
-    egen tag = tag(uid)
-
-    tw ///
-      (histogram pre_checklist if tag == 1, frac yaxis(2) color(gs14) start(0) w(0.05) gap(10)) ///
-      (lowess correct   pre_checklist  if city == 1 , lc(black) lw(thick)) ///
-      (lowess test_cov  pre_checklist  if city == 1 , lc(black) lw(thick) lp(dash)) ///
-      (lowess correct   pre_checklist  if city == 2 , lc(blue)  lw(thick)) ///
-      (lowess test_cov  pre_checklist  if city == 2 , lc(blue)  lw(thick) lp(dash)) ///
-    , ${hist_opts} ///
-      legend(on pos(12) c(3) region(lc(none)) symxsize(medium) ///
-             order(0 "Patna:" 2 "TB Test or Refer" 3 "Covid Test or Refer" 0 "Mumbai:" 4 "TB Test or Refer" 5 "Covid Test or Refer")) ///
-      xlab(${pct75}) xoverhang xtit("TB Checklist Completion 2014-2019") ///
-      ylab(${pct}) ytit("Current Quality") yscale(noline) ylab(0 "0%" .05 "5%" .1 "10%" .15 "15%", axis(2))
-
-    graph export "${dir}/output/checklist.pdf" , replace
-
-// Figure 2
-
+// Figure 4
 use "${dir}/data/constructed/sp-covet.dta" , clear
 
-  egen tag = tag(uid)
-
-  tw ///
-    (histogram pre_correct if tag == 1, frac yaxis(2) color(gs14) start(0) w(0.05) gap(10)) ///
-    (lowess cov_screen   pre_correct  if city == 1 , lc(black) lw(thick)) ///
-    (lowess cov_screen   pre_correct  if city == 2 , lc(blue)  lw(thick)) ///
-  , ${hist_opts} ytit(" ") ///
-    legend(on pos(12) c(3) region(lc(none)) symxsize(med) ///
-           order(2 "Patna" 3 "Mumbai")) ///
-    xlab(${pct}) xoverhang xtit("TB Management Quality 2014-2019") ///
-    ylab(${pct20}) title("Screening") yscale(noline) ylab(0 "0%" .05 "5%" .1 "10%" .15 "15%", axis(2))
-
-    graph save "${dir}/output/temp/qual-screen.gph" , replace
-
-
-  tw ///
-    (histogram pre_correct if tag == 1, frac yaxis(2) color(gs14) start(0) w(0.05) gap(10)) ///
-    (lowess ppe   pre_correct  if city == 1 , lc(black) lw(thick)) ///
-    (lowess ppe   pre_correct  if city == 2 , lc(blue)  lw(thick)) ///
-  , ${hist_opts} ytit(" ") ///
-    legend(on pos(12) c(3) region(lc(none)) symxsize(med) ///
-           order(2 "Patna" 3 "Mumbai")) ///
-    xlab(${pct}) xoverhang xtit("TB Management Quality 2014-2019") ///
-    ylab(${pct}) title("Safety") yscale(noline) ylab(0 "0%" .05 "5%" .1 "10%" .15 "15%", axis(2))
-
-  graph save "${dir}/output/temp/qual-ppe.gph" , replace
-
-  grc1leg ///
-    "${dir}/output/temp/qual-screen.gph" ///
-    "${dir}/output/temp/qual-ppe.gph"
-
-  graph export "${dir}/output/screening-safety.pdf" , replace
-
-// Figure 2
-
-use "${dir}/data/constructed/sp-covet.dta" , clear
-
-  egen tag = tag(uid)
-
-  tw ///
-    (histogram pre_correct if tag == 1, frac yaxis(2) color(gs14) start(0) w(0.05) gap(10)) ///
-    (lowess ppe_1   pre_correct  ,  lw(thick) lc(navy)  lp(dash) ) ///
-    (lowess ppe_3   pre_correct  ,  lw(thick) lc(black) lp(solid)) ///
-    (lowess mask_hi pre_correct  ,  lw(thick) lc(black) lp(dash) ) ///
-  , ${hist_opts} ///
-    legend(on pos(12) c(3) region(lc(none))  colfirst ///
-           order(2 "Patients Mask" 3 "Provider Masks"  4 "Surgical or N95")) ///
-    xlab(${pct}) xoverhang xtit("TB Management Quality 2014-2019") ///
-    ylab(${pct75}) ytit(" ") yscale(noline) ylab(none, axis(2))
-
-    graph export "${dir}/output/masks.pdf" , replace
-
-// Figure 2
-
-use "${dir}/data/constructed/sp-covet.dta" , clear
-
-  egen tag = tag(uid)
-
-  tw ///
-    (histogram pre_correct if tag == 1, frac yaxis(2) color(gs14) start(0) w(0.05) gap(10)) ///
-    (lowess ppe_2   pre_correct  ,  lw(thick) ) ///
-    (lowess ppe_7   pre_correct  ,  lw(thick) ) ///
-    (lowess cov_1 pre_correct  ,  lw(thick) ) ///
-    (lowess cov_2 pre_correct  ,  lw(thick) ) ///
-  , ${hist_opts} ///
-    legend(on pos(12) c(3) region(lc(none))  colfirst ///
-           order(2 "Distancing" 3 "Handwash"  4 "Screen Fever" 5  "Ask Covid History")) ///
-    xlab(${pct}) xoverhang xtit("TB Management Quality 2014-2019") ///
-    ylab(${pct20}) ytit(" ") yscale(noline) ylab(none, axis(2))
-
-    graph export "${dir}/output/ppe.pdf" , replace
-
-// Figure 2
-
-use "${dir}/data/constructed/sp-covet.dta" , clear
-
-  lab var pre_correct "0%-100% increase in prior quality"
+  lab var pre_correct "100% increase in prior quality"
+  ren cov_screen screen
+    lab var screen "Any Screening"
+    lab var ppe "Any Safety"
 
   forest reg ///
-    (ppe_*) (cov_*) ///
+    (ppe ppe_* mask_hi ) (screen cov_*) ///
   , t(pre_correct) c(i.city i.case) b bh sort(local) ///
-    graph(ysize(5) scale(0.7) xlab(0 "Zero" .1 "+10p.p." .2 "+20p.p." .3 "+30p.p."))
+    graph(ysize(5) scale(0.7)  title("Safety (F1) and Screening (F2)" , span pos(11)) ///
+          xlab(0 "Zero" .1 "+10p.p." .2 "+20p.p." .3 "+30p.p."))
 
-    graph export "${dir}/output/impacts.pdf" , replace
-
-// Figure 2
-
-use "${dir}/data/constructed/sp-covet.dta" , clear
-
-  lab var pre_correct "0%-100% increase in prior quality"
+    graph save "${dir}/output/temp/for-ppe.gph" , replace
 
   forest reg ///
     (correct test_cxr test_afb test_gx test_cov refer ///
      med_anti_any_3 med_anti_any_2 med_code_any_9) ///
   , t(pre_correct) c(i.city i.case) b bh sort(local) ///
-    graph(ysize(5) scale(0.7) xlab(0 "Zero" .1 "+10p.p." .2 "+20p.p." .3 "+30p.p."))
+    graph(ysize(5) title("Quality of TB Care" , span pos(11)) ///
+          xlab(0 "Zero" -.2 "-20p.p." .2 "+20p.p." .4 "+40p.p."))
+
+
+    graph save "${dir}/output/temp/for-qual.gph" , replace
+
+    graph combine ///
+    "${dir}/output/temp/for-qual.gph" ///
+    "${dir}/output/temp/for-ppe.gph" ///
+    , c(1) ysize(7)
+
+    graph export "${dir}/output/f4-impacts.pdf" , replace
 
 
 // End
