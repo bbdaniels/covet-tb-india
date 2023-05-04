@@ -15,6 +15,7 @@ ieboilstart, v(16.1) adopath("${dir}/ado" , strict)
     net install sumstats
     net install outwrite
     net install forest
+    net install intervals
 
 // Graph scheming
 
