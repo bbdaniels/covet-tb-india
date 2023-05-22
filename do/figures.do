@@ -1,4 +1,51 @@
-// Figures for SP Covet Paper
+// Figures for SP Covet Report
+
+// Attrition figures
+
+
+
+// Core figures
+
+use "${dir}/data/constructed/sp-all.dta" if case == 1 , clear
+
+  betterbarci test_gx ///
+    , over(round) by(city) v n ///
+      legend(on region(lw(none)) symxsize(small) r(1) pos(6) ring(1) ///
+            order(1 "2014-2015" 2 "2016-2017" 3 "2018-2019" 4 "2021-2022")) ///
+      bar pct barc(navy navy%60 navy%40 navy%20) ylab(${pct20})
+
+  betterbarci test_cxr ///
+    , over(round) by(city) v n ///
+      legend(on region(lw(none)) symxsize(small) r(1) pos(6) ring(1) ///
+            order(1 "2014-2015" 2 "2016-2017" 3 "2018-2019" 4 "2021-2022")) ///
+      bar pct barc(navy navy%60 navy%40 navy%20) ylab(${pct})
+
+  betterbarci test_afb ///
+    , over(round) by(city) v n ///
+      legend(on region(lw(none)) symxsize(small) r(1) pos(6) ring(1) ///
+            order(1 "2014-2015" 2 "2016-2017" 3 "2018-2019" 4 "2021-2022")) ///
+      bar pct barc(navy navy%60 navy%40 navy%20) ylab(${pct20} .25 "25%")
+
+
+  betterbarci med_anti_any_3 ///
+    , over(round) by(city) v n ///
+      legend(on region(lw(none)) symxsize(small) r(1) pos(6) ring(1) ///
+            order(1 "2014-2015" 2 "2016-2017" 3 "2018-2019" 4 "2021-2022")) ///
+      bar pct barc(navy navy%60 navy%40 navy%20) ylab(${pct})
+
+  betterbarci med_anti_any_2 ///
+    , over(round) by(city) v n ///
+      legend(on region(lw(none)) symxsize(small) r(1) pos(6) ring(1) ///
+            order(1 "2014-2015" 2 "2016-2017" 3 "2018-2019" 4 "2021-2022")) ///
+      bar pct barc(navy navy%60 navy%40 navy%20) ylab(${pct20})
+
+  betterbarci med_code_any_9 ///
+    , over(round) by(city) v n ///
+      legend(on region(lw(none)) symxsize(small) r(1) pos(6) ring(1) ///
+            order(1 "2014-2015" 2 "2016-2017" 3 "2018-2019" 4 "2021-2022")) ///
+      bar pct barc(navy navy%60 navy%40 navy%20) ylab(${pct20})
+
+----
 
 // Figure 1
 use "${dir}/data/constructed/sp-covet.dta" , clear

@@ -1,5 +1,13 @@
 // Get data files set up for analysis
 
+// Create blended data
+use "${dir}/data/constructed/sp-combined.dta" ///
+  if case == 1 | case == 9 , clear
+
+  iecodebook export ///
+  using "${dir}/data/constructed/sp-all.xlsx" ///
+    , save sign reset replace
+
 // Create pre-covet index
 use "${dir}/data/constructed/sp-combined.dta" ///
   if round < 4 & case < 5 , clear
