@@ -2,7 +2,8 @@
 
 // Create blended data
 use "${dir}/data/constructed/sp-combined.dta" ///
-  if case == 1 | case == 9 , clear
+  /// if case == 1 | case == 9 ///
+  , clear
 
   iecodebook export ///
   using "${dir}/data/constructed/sp-all.xlsx" ///
