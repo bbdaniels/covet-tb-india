@@ -1,5 +1,34 @@
 // Figures for SP Covet Paper
 
+// Figure
+use "${dir}/data/constructed/sp-long.dta" , clear
+
+  lab def round 3 "2018-19" 4 "2020-21" , replace
+
+  betterbarci ///
+    correct test_cxr test_afb test_gx refer ///
+    med_anti_any_3 med_anti_any_2 med_code_any_9 ///
+    if city == 1 ///
+    , over(round) legend(on pos(12) region(lw(none))) ///
+      bar barc(red black) pct xoverhang xlab(${pct}) title("Patna")
+
+      graph save "${dir}/output/temp/bar-patna.gph" , replace
+
+  betterbarci ///
+    correct test_cxr test_afb test_gx refer ///
+    med_anti_any_3 med_anti_any_2 med_code_any_9 ///
+    if city == 2 ///
+    , over(round) legend(on pos(12) region(lw(none))) ///
+      bar barc(red black) pct xoverhang xlab(${pct}) title("Mumbai")
+
+      graph save "${dir}/output/temp/bar-mumbai.gph" , replace
+
+  grc1leg ///
+    "${dir}/output/temp/bar-patna.gph" ///
+    "${dir}/output/temp/bar-mumbai.gph"
+
+  graph export "${dir}/output/f3-rounds.pdf" , replace
+
 // Figure 1
 use "${dir}/data/constructed/sp-covet.dta" , clear
 

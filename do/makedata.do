@@ -1,5 +1,16 @@
 // Get data files set up for analysis
 
+// Create blended data
+use "${dir}/data/constructed/sp-combined.dta" ///
+  if case == 1 & round > 2 ///
+  , clear
+
+  lab var correct "TB Test or Refer"
+
+  iecodebook export ///
+  using "${dir}/data/constructed/sp-long.xlsx" ///
+    , save sign reset replace
+
 // Create pre-covet index
 use "${dir}/data/constructed/sp-combined.dta" ///
   if round < 4 & case < 5 , clear
