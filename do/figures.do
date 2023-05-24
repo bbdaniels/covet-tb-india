@@ -82,36 +82,15 @@ use "${dir}/data/constructed/sp-covet.dta" , clear
     lab var ppe "Any Safety"
 
   forest reg ///
-    (ppe ppe_* mask_hi ) ///
-  , t(pre_correct) c(i.city i.case) b bh sort(local) cl(uid) ///
-    graph(ysize(5) title("IPC Measures" , span pos(11)) ///
-          xlab(0 "Zero" .1 "+10p.p." .2 "+20p.p." .3 "+30p.p."))
-
-    graph save "${dir}/output/temp/for-ppe.gph" , replace
-
-  forest reg ///
-    (screen cov_*) ///
-  , t(pre_correct) c(i.city i.case) b bh sort(local) cl(uid) ///
-    graph(ysize(5) title("Covid Screening" , span pos(11)) ///
-          xlab(0 "Zero" .1 "+10p.p." .2 "+20p.p." .3 "+30p.p."))
-
-    graph save "${dir}/output/temp/for-screen.gph" , replace
-
-  forest reg ///
     (correct test_cxr test_afb test_gx test_cov refer ///
      med_anti_any_3 med_anti_any_2 med_code_any_9) ///
+    (ppe_* mask_hi ) ///
+    (cov_*) ///
   , t(pre_correct) c(i.city i.case) b bh sort(local) cl(uid) ///
-    graph(ysize(5) title("Quality of TB Care" , span pos(11)) ///
+    graph(scale(0.7) ysize(7) ///
+          legend(on c(1) ring(0) pos(1) ///
+                 order(0 "[F1] TB Quality" 0 "[F2] IPC Measures" 0 "[F3] Covid Screening")) ///
           xlab(0 "Zero" -.2 "-20p.p." .2 "+20p.p." .4 "+40p.p." .6 "+60p.p."))
-
-
-    graph save "${dir}/output/temp/for-qual.gph" , replace
-
-    graph combine ///
-    "${dir}/output/temp/for-qual.gph" ///
-    "${dir}/output/temp/for-ppe.gph" ///
-    "${dir}/output/temp/for-screen.gph" ///
-    , c(1) ysize(7) imargin(tiny) altshrink
 
     graph export "${dir}/output/f4-impacts.pdf" , replace
 
