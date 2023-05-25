@@ -89,7 +89,7 @@ use "${dir}/data/constructed/sp-covet.dta" , clear
   , t(pre_correct) c(i.city i.case) b bh sort(local) cl(uid) ///
     graph(scale(0.7) ysize(7) ///
           legend(on c(1) ring(0) pos(1) ///
-                 order(0 "[F1] TB Quality" 0 "[F2] IPC Measures" 0 "[F3] Covid Screening")) ///
+                 order(0 "[F1] Technical Quality" 0 "[F2] IPC Measures" 0 "[F3] Covid Screening")) ///
           xlab(0 "Zero" -.2 "-20p.p." .2 "+20p.p." .4 "+40p.p." .6 "+60p.p."))
 
     graph export "${dir}/output/f4-impacts.pdf" , replace

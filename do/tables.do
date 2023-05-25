@@ -35,10 +35,11 @@ use "${dir}/data/constructed/sp-covet.dta" , clear
 
 local varlist correct test_cxr test_afb test_gx test_cov refer ///
               med_anti_any_3 med_anti_any_2 med_code_any_9
+local labels ""
 
 foreach var of varlist  `varlist'  {
   reg `var' ///
-    i.city 9.case pre_* ppe_1 ppe_3 mask_hi , cl(uid) coefl
+    i.city 9.case pre_correct , cl(uid) coefl
 
     est sto `var'
     local labels = `"`labels' "`:var lab `var''" "'
@@ -50,10 +51,11 @@ outwrite `varlist' using "${dir}/output/regressions.xlsx" , replace col(`labels'
 use "${dir}/data/constructed/sp-covet.dta" , clear
 
 local varlist ppe_* mask_hi
+local labels ""
 
 foreach var of varlist  `varlist'  {
   reg `var' ///
-    i.city 9.case pre_* correct test_cxr test_afb test_gx test_cov refer , cl(uid) coefl
+    i.city 9.case pre_correct , cl(uid) coefl
 
     est sto `var'
     local labels = `"`labels' "`:var lab `var''" "'
