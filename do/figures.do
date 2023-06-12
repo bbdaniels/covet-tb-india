@@ -31,14 +31,19 @@ use "${dir}/data/constructed/sp-all.dta" if round > 2, clear
 
   lab def case 1 "Standard TB Case" 9 "Covid-Like Case" , replace
 
+  egen symscreen = rowmax(cov_6 cov_7 cov_8 cov_9 cov_10 cov_11 cov_12 cov_13 cov_14 cov_15 cov_16)
+    lab var symscreen "Ask About Symptoms"
+
   ren cov_screen screen
     lab var screen "{&darr} {bf:Covid Screening} {&darr}"
     lab var ppe "{&darr} {bf:IPC Measures} {&darr}"
 
   betterbarci ///
-    ppe ppe_* mask_hi screen cov_* ///
-    , over(city) legend(on pos(12) region(lc(none))) xlab(${pct}) xoverhang ysize(7) ///
-      bar pct scale(0.7) vce(cluster uid) n
+    ppe ppe_3 mask_hi ppe_1 ppe_2 ppe_5 ppe_7 ppe_8 ///
+    screen cov_1-cov_5 symscreen ///
+    , over(city) legend(on symxsize(small) pos(12) region(lc(none))) xlab(${pct}) ///
+      xoverhang ysize(7) ///
+      bar pct vce(cluster uid) n
 
       graph export "${dir}/output/ipc-screen.pdf" , replace
 
@@ -61,8 +66,11 @@ use "${dir}/data/constructed/sp-all.dta" if round > 2, clear
 
     lab def case 1 "Standard" 9 "Covid-Like" , modify
 
+    egen test_cov = rowmax(test_cov*)
+    lab var test_cov "Covid Test"
+
     betterbarci ///
-        test_cxr test_afb test_gx refer ///
+        test_cov test_cxr test_afb test_gx refer ///
         med_anti_any_1 med_anti_any_3 med_anti_any_2 med_code_any_9 ///
       , over(case) n ///
         legend(on region(lw(none)) symxsize(small) r(1) pos(6) ring(1) ) ///
