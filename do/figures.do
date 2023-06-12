@@ -138,45 +138,20 @@ use "${dir}/data/constructed/sp-all.dta" if case == 1 , clear
       graph export "${dir}/output/cross-ster.pdf" , replace
 
 // Study 2: Longitudinal
-use "${dir}/data/constructed/sp-all.dta" if round < 4 & case == 1 , clear
+use "${dir}/data/constructed/sp-covet.dta" , clear
 
-  keep correct city fid round test_*
+  forest reg (test_cov) (cov_*) , t(pre_correct) c(i.city i.case) b bh cl(fid) sort(local) ///
+    graph(xoverhang xlab(${pct20}) ///
+          xtit("{&larr} Less | {bf:Covid Testing and Screening} | More {&rarr}"))
 
-  collapse (mean) c = correct a = test_afb x = test_cxr g = test_gx , by(city fid)
 
-  merge 1:m city fid using "${dir}/data/constructed/sp-all.dta" , keep(3) nogen
-    keep if round == 4 & case == 1
+    graph export "${dir}/output/long-screen.pdf" , replace
 
-  tw (fpfit correct c , lw(thick)) ///
-     (fpfit test_afb a , lw(thick)) ///
-     (fpfit test_gx g , lw(thick)) ///
-     (fpfit test_cxr x , lw(thick)) ///
-  , legend(on c(1) pos(11) ring(0) ///
-           order(1 "TB Test or Refer" 4 "Chest X-Ray" ///
-                 3 "GeneXpert" 2 "Sputum AFB" )) ///
-    xlab(${pct}) ylab(${pct}) xtit("Pre-Covid") ytit("Post-Covid") xoverhang
+  forest reg (ppe_*) , t(pre_correct) c(i.city i.case) b bh cl(fid) sort(local) ///
+    graph(xoverhang xlab(${pct75}) ///
+         xtit("{&larr} Less | {bf:IPC Measures} | More {&rarr}"))
 
-    graph export "${dir}/output/long-good.pdf" , replace
-
-use "${dir}/data/constructed/sp-all.dta" if round < 4 & case == 1 , clear
-
-  keep correct city fid round med_anti_any_3 med_anti_any_2 med_code_any_9
-
-  collapse (mean) abx = med_anti_any_3 fq = med_anti_any_2 ster = med_code_any_9 , by(city fid)
-
-  merge 1:m city fid using "${dir}/data/constructed/sp-all.dta" , keep(3) nogen
-    keep if round == 4 & case == 1
-
-  tw ///
-     (fpfit med_anti_any_3 abx , lw(thick)) ///
-     (fpfit med_anti_any_2 fq , lw(thick)) ///
-     (fpfit med_code_any_9 ster , lw(thick)) ///
-  , legend(on c(1) pos(11) ring(0) ///
-           order(1 "Antibiotics"  ///
-                 3 "Steroids" 2 "Fluoroquinolones" )) ///
-    xlab(${pct}) ylab(${pct}) xtit("Pre-Covid") ytit("Post-Covid") xoverhang
-
-    graph export "${dir}/output/long-bad.pdf" , replace
+    graph export "${dir}/output/long-ipc.pdf" , replace
 
 // Study 2: Longitudinal
 use "${dir}/data/constructed/sp-all.dta"  , clear
@@ -190,11 +165,12 @@ use "${dir}/data/constructed/sp-all.dta"  , clear
 
   lab var correct "TB Test or Refer"
   lab var r4 "Appeared in Round 4 (Non-Attriting)"
-    replace r4 = 1-r4
 
   forest reg (correct test_afb test_cxr test_gx ///
               med_anti_any_3 med_anti_any_2 med_code_any_9) ///
-        , t(r4) b bh sort(local) graph(xtit("Association with Attrition"))
+        , t(r4) b bh sort(local) ///
+         graph(xoverhang xlab(${pct20}) ///
+               xtit("{&larr} More | {bf:Attrition} | Less {&rarr}"))
 
         graph export "${dir}/output/long-attrit.pdf" , replace
 
