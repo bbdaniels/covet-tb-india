@@ -110,6 +110,40 @@ use "${dir}/data/constructed/sp-all.dta" if case == 1 , clear
 
       graph export "${dir}/output/cross-afb.pdf" , replace
 
+// Prices
+use "${dir}/data/constructed/sp-all.dta" if case == 1 , clear
+
+  gen p2 = .
+  replace p2 = price / 65 if round == 1
+  replace p2 = price / 65 if round == 2
+  replace p2 = price / 70 if round == 3
+  replace p2 = price / 80 if round == 4
+
+  lab var p2 "Price (USD)"
+  lab var price "Price (INR)"
+
+  betterbarci p2 ///
+  , over(round) by(city) v bar ///
+    barc(dkgreen dkgreen%80 dkgreen%60 dkgreen%40)
+
+    graph save "${dir}/output/price-usd.gph" , replace
+
+  betterbarci price ///
+  , over(round) by(city) v bar ///
+    barc(dkgreen dkgreen%80 dkgreen%60 dkgreen%40) ///
+    legend(on order(1 "2014-2015" 2 "2016-2017" 3 "2018-2019" 4 "2021-2022"))
+
+    graph save "${dir}/output/price-inr.gph" , replace
+
+    grc1leg  ///
+      "${dir}/output/price-inr.gph" ///
+      "${dir}/output/price-usd.gph" ///
+      , c(1)
+
+      graph draw, ysize(6)
+
+      graph export "${dir}/output/price.pdf" , replace
+
 // Study 1: Bad things
 use "${dir}/data/constructed/sp-all.dta" if case == 1 , clear
 
