@@ -2,27 +2,30 @@
 
 // Attrition figures
 
-use "${dir}/data/constructed/sp-all.dta" if round > 2, clear
+use "/Users/bbdaniels/Library/CloudStorage/Box-Box/_Papers/SP Patna/data/raw/patna-samples.dta", clear
+reshape long sam_ sps_ , i(fid) j(round)
+gen city = 1
+  tempfile pat
+  save `pat'
 
-  egen tag = tag(city fidcode round)
-    keep if tag
+use "/Users/bbdaniels/Library/CloudStorage/Box-Box/_Papers/SP Mumbai/data/raw/mumbai-facility-samples.dta", clear
+drop if fid == ""
+gen city = 2
+reshape long sam_ sps_ , i(fid) j(round)
+  append using `pat' , force
 
-  egen n = group(city fidcode)
-  bys city: egen no = min(n)
-    replace n = n - no + 1
-  bys city: egen N = max(n)
+  lab def city 1 "Patna" 2 "Mumbai"
+    lab val city city
 
-  bys city n : gen n2 = _N
+  lab var sps_ "Sample Completion"
 
-  tw ///
-    (scatter n round if n2 == 2 , mc(black)) ///
-    (scatter n round if n2 == 1 , mc(red) m(x)) ///
-    , xlab(2.5 " " 3 "2018-19" 4 "2021-22" 4.5 " " ,notick) ///
-      legend(off order(1 "Matched" 2 "Unmatched")) by(city , legend(on) note(" ")) ///
-      ytit("Practices Sampled in 2018-19") yline(100 200 300 , lc(gray)) ///
-      ysize(6) xoverhang
+  betterbarci sps_ if (sam_ == 1 & round > 1) | (sps_ == 1 & round == 1) ///
+  , over(round) by(city) v pct bar barc(dkgreen%70 dkgreen%80 dkgreen%90 dkgreen) ///
+    legend(on order(1 "2014-2015" 2 "2016-2017" 3 "2018-2019" 4 "2021-2022")) ylab(${pct})
 
-      graph export "${dir}/output/qutub-sampling.pdf" , replace
+    graph export "${dir}/output/qutub-attrition.pdf" , replace
+
+
 
 // Study 1: All things
 
@@ -46,6 +49,22 @@ use "${dir}/data/constructed/sp-all.dta" if round > 2, clear
       bar pct vce(cluster uid) n
 
       graph export "${dir}/output/ipc-screen.pdf" , replace
+
+  // Qutub summary
+
+  use "${dir}/data/constructed/sp-combined.dta" ///
+    if round < 4 & case < 5 , clear
+
+    lab var correct "Correct"
+
+    betterbarci ///
+        correct test_cxr test_afb test_gx refer ///
+        med_anti_any_1 med_anti_any_3 med_anti_any_2 med_code_any_9 ///
+      , over(city) n ///
+        legend(on region(lw(none)) symxsize(small) r(1) pos(6) ring(1) ) ///
+        bar pct xlab(${pct}) ysize(6) xoverhang
+
+        graph export "${dir}/output/qutub-summary.pdf" , replace
 
   // Key behaviors by round
   use "${dir}/data/constructed/sp-all.dta" if case == 1 & round > 2 , clear
