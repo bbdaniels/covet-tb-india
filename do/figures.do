@@ -100,6 +100,18 @@ reshape long sam_ sps_ , i(fid) j(round)
 // Study 1: Good things
 use "${dir}/data/constructed/sp-all.dta" if case == 1 , clear
 
+  gen microbio = test_afb == 1 | test_gx == 1
+    lab var microbio "Microbiology"
+
+  betterbarci microbio ///
+    , over(round) by(city) v n ///
+      legend(on region(lw(none)) symxsize(small) r(1) pos(6) ring(1) ///
+            order(1 "2014-2015" 2 "2016-2017" 3 "2018-2019" 4 "2021-2022")) ///
+      bar pct barc(navy navy%60 navy%40 navy%20) ylab(${pct20}) ///
+      xoverhang
+
+      graph export "${dir}/output/cross-mb.pdf" , replace
+
   lab var  correct "Test or Refer"
 
   betterbarci test_gx ///
