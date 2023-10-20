@@ -2,13 +2,13 @@
 
 // Attrition figures
 
-use "/Users/bbdaniels/Library/CloudStorage/Box-Box/_Papers/SP Patna/data/raw/patna-samples.dta", clear
+use "/Users/bbdaniels/Library/CloudStorage/Box-Box/_Papers/SP Patna PPIA/data/raw/patna-samples.dta", clear
 reshape long sam_ sps_ , i(fid) j(round)
 gen city = 1
   tempfile pat
   save `pat'
 
-use "/Users/bbdaniels/Library/CloudStorage/Box-Box/_Papers/SP Mumbai/data/raw/mumbai-facility-samples.dta", clear
+use "/Users/bbdaniels/Library/CloudStorage/Box-Box/_Papers/SP Mumbai PPIA/data/raw/mumbai-facility-samples.dta", clear
 drop if fid == ""
 gen city = 2
 reshape long sam_ sps_ , i(fid) j(round)
@@ -21,9 +21,9 @@ reshape long sam_ sps_ , i(fid) j(round)
 
   betterbarci sps_ if (sam_ == 1 & round > 1) | (sps_ == 1 & round == 1) ///
   , over(round) by(city) v pct bar barc(dkgreen%70 dkgreen%80 dkgreen%90 dkgreen) ///
-    legend(on order(1 "2014-2015" 2 "2016-2017" 3 "2018-2019" 4 "2021-2022")) ylab(${pct})
+    legend(on order(1 "2014-2015" 2 "2016-2017" 3 "2018-2019" 4 "1-2022")) ylab(${pct})
 
-    graph export "${dir}/output/qutub-attrition.pdf" , replace
+    graph export "${dir}/output/qutub-attrition.png" , replace
 
 
 
@@ -48,7 +48,7 @@ reshape long sam_ sps_ , i(fid) j(round)
       xoverhang ysize(7) ///
       bar pct vce(cluster uid) n
 
-      graph export "${dir}/output/ipc-screen.pdf" , replace
+      graph export "${dir}/output/ipc-screen.png" , replace
 
   // Qutub summary
 
@@ -64,7 +64,7 @@ reshape long sam_ sps_ , i(fid) j(round)
         legend(on region(lw(none)) symxsize(small) r(1) pos(6) ring(1) ) ///
         bar pct xlab(${pct}) ysize(6) xoverhang
 
-        graph export "${dir}/output/qutub-summary.pdf" , replace
+        graph export "${dir}/output/qutub-summary.png" , replace
 
   // Key behaviors by round
   use "${dir}/data/constructed/sp-all.dta" if case == 1 & round > 2 , clear
@@ -78,7 +78,7 @@ reshape long sam_ sps_ , i(fid) j(round)
       legend(on region(lw(none)) symxsize(small) r(1) pos(6) ring(1) ) ///
       bar pct xlab(${pct}) ysize(6) xoverhang
 
-      graph export "${dir}/output/cross-r34.pdf" , replace
+      graph export "${dir}/output/cross-r34.png" , replace
 
   // Key behaviors by case
   use "${dir}/data/constructed/sp-all.dta" if round == 4 , clear
@@ -95,7 +95,7 @@ reshape long sam_ sps_ , i(fid) j(round)
         legend(on region(lw(none)) symxsize(small) r(1) pos(6) ring(1) ) ///
         bar pct xlab(${pct}) ysize(6) xoverhang
 
-        graph export "${dir}/output/cross-case.pdf" , replace
+        graph export "${dir}/output/cross-case.png" , replace
 
 // Study 1: Good things
 use "${dir}/data/constructed/sp-all.dta" if case == 1 , clear
@@ -110,7 +110,7 @@ use "${dir}/data/constructed/sp-all.dta" if case == 1 , clear
       bar pct barc(navy navy%60 navy%40 navy%20) ylab(${pct20}) ///
       xoverhang
 
-      graph export "${dir}/output/cross-mb.pdf" , replace
+      graph export "${dir}/output/cross-mb.png" , replace
 
   lab var  correct "Test or Refer"
 
@@ -121,7 +121,7 @@ use "${dir}/data/constructed/sp-all.dta" if case == 1 , clear
       bar pct barc(navy navy%60 navy%40 navy%20) ylab(${pct20}) ///
       xoverhang
 
-      graph export "${dir}/output/cross-gx.pdf" , replace
+      graph export "${dir}/output/cross-gx.png" , replace
 
   betterbarci test_cxr ///
     , over(round) by(city) v n ///
@@ -130,7 +130,7 @@ use "${dir}/data/constructed/sp-all.dta" if case == 1 , clear
       bar pct barc(navy navy%60 navy%40 navy%20) ylab(${pct}) ///
       xoverhang
 
-      graph export "${dir}/output/cross-cxr.pdf" , replace
+      graph export "${dir}/output/cross-cxr.png" , replace
 
   betterbarci test_afb ///
     , over(round) by(city) v n ///
@@ -139,7 +139,7 @@ use "${dir}/data/constructed/sp-all.dta" if case == 1 , clear
       bar pct barc(navy navy%60 navy%40 navy%20) ylab(${pct20} .25 "25%") ///
       xoverhang
 
-      graph export "${dir}/output/cross-afb.pdf" , replace
+      graph export "${dir}/output/cross-afb.png" , replace
 
 // Prices
 use "${dir}/data/constructed/sp-all.dta" if case == 1 , clear
@@ -173,7 +173,7 @@ use "${dir}/data/constructed/sp-all.dta" if case == 1 , clear
 
       graph draw, ysize(6)
 
-      graph export "${dir}/output/price.pdf" , replace
+      graph export "${dir}/output/price.png" , replace
 
 // Study 1: Bad things
 use "${dir}/data/constructed/sp-all.dta" if case == 1 , clear
@@ -184,7 +184,7 @@ use "${dir}/data/constructed/sp-all.dta" if case == 1 , clear
             order(1 "2014-2015" 2 "2016-2017" 3 "2018-2019" 4 "2021-2022")) ///
       bar pct barc(maroon maroon%60 maroon%40 maroon%20) ylab(${pct})
 
-      graph export "${dir}/output/cross-abx.pdf" , replace
+      graph export "${dir}/output/cross-abx.png" , replace
 
   betterbarci med_anti_any_2 ///
     , over(round) by(city) v n ///
@@ -192,7 +192,7 @@ use "${dir}/data/constructed/sp-all.dta" if case == 1 , clear
             order(1 "2014-2015" 2 "2016-2017" 3 "2018-2019" 4 "2021-2022")) ///
       bar pct barc(maroon maroon%60 maroon%40 maroon%20) ylab(${pct20})
 
-      graph export "${dir}/output/cross-fq.pdf" , replace
+      graph export "${dir}/output/cross-fq.png" , replace
 
   betterbarci med_code_any_9 ///
     , over(round) by(city) v n ///
@@ -200,7 +200,7 @@ use "${dir}/data/constructed/sp-all.dta" if case == 1 , clear
             order(1 "2014-2015" 2 "2016-2017" 3 "2018-2019" 4 "2021-2022")) ///
       bar pct barc(maroon maroon%60 maroon%40 maroon%20) ylab(${pct20})
 
-      graph export "${dir}/output/cross-ster.pdf" , replace
+      graph export "${dir}/output/cross-ster.png" , replace
 
 // Study 2: Longitudinal
 use "${dir}/data/constructed/sp-covet.dta" , clear
@@ -210,13 +210,13 @@ use "${dir}/data/constructed/sp-covet.dta" , clear
           xtit("{&larr} Less | {bf:Covid Testing and Screening} | More {&rarr}"))
 
 
-    graph export "${dir}/output/long-screen.pdf" , replace
+    graph export "${dir}/output/long-screen.png" , replace
 
   forest reg (ppe_*) , t(pre_correct) c(i.city i.case) b bh cl(fid) sort(local) ///
     graph(xoverhang xlab(${pct75}) ///
          xtit("{&larr} Less | {bf:IPC Measures} | More {&rarr}"))
 
-    graph export "${dir}/output/long-ipc.pdf" , replace
+    graph export "${dir}/output/long-ipc.png" , replace
 
 // Study 2: Longitudinal
 use "${dir}/data/constructed/sp-all.dta"  , clear
@@ -237,6 +237,6 @@ use "${dir}/data/constructed/sp-all.dta"  , clear
          graph(xoverhang xlab(${pct20}) ///
                xtit("{&larr} More | {bf:Attrition} | Less {&rarr}"))
 
-        graph export "${dir}/output/long-attrit.pdf" , replace
+        graph export "${dir}/output/long-attrit.png" , replace
 
 // End

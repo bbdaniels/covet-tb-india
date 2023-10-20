@@ -6,7 +6,7 @@ ieboilstart, v(16.1) adopath("${dir}/ado" , strict)
 
 // Install ado-files
 
-  ssc install iefieldkit
+  ssc install iefieldkit , replace
   net install grc1leg, from("http://www.stata.com/users/vwiggins")
 
   net from https://github.com/bbdaniels/stata/raw/main/
@@ -14,7 +14,7 @@ ieboilstart, v(16.1) adopath("${dir}/ado" , strict)
     net install betterbar
     net install sumstats
     net install outwrite
-    net install forest
+    net install forest , replace
 
 // Graph scheming
 
@@ -34,12 +34,12 @@ ieboilstart, v(16.1) adopath("${dir}/ado" , strict)
 // Get raw data
 
   iecodebook export ///
-   "${box}/_Papers/SP Mumbai/data/raw/mumbai-sp.dta" ///
+   "${box}/_Papers/SP Mumbai PPIA/data/raw/mumbai-sp.dta" ///
   using "${dir}/data/raw/mumbai.xlsx" ///
     , save sign reset replace
 
   iecodebook export ///
-   "${box}/_Papers/SP Patna/data/raw/patna-sp.dta" ///
+   "${box}/_Papers/SP Patna PPIA/data/raw/patna-sp.dta" ///
   using "${dir}/data/raw/patna.xlsx" ///
     , save sign reset replace
 
