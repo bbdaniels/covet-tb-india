@@ -7,7 +7,9 @@ ieboilstart, v(16.1) adopath("${dir}/ado" , strict)
 // Install ado-files
 
   ssc install iefieldkit , replace
+  ssc install reghdfe , replace
   net install grc1leg, from("http://www.stata.com/users/vwiggins")
+  net install binsreg, from("https://raw.githubusercontent.com/nppackages/binsreg/master/stata/")
 
   net from https://github.com/bbdaniels/stata/raw/main/
     net install labelcollapse
