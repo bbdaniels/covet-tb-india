@@ -7,6 +7,9 @@ use "${dir}/data/constructed/sp-combined.dta" ///
 
   keep if case < 5
 
+  egen checklist = rowmean(sp?_h*)
+    lab var checklist "Checklist"
+
   replace fid = pid if pid != ""
 
   encode fid , gen(uid)
