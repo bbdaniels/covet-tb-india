@@ -25,13 +25,15 @@ use "${dir}/data/constructed/sp-all.dta" if price < 2000 & price > 0 & time < 15
   graph matrix price checklist correct refer time med
 
   binsreg price checklist correct refer time med   ///
-    , polyreg(3)
+    , polyreg(1)
+    reg price checklist correct refer time med
   binsreg price correct checklist  refer time med   ///
-    , polyreg(3)
+    , polyreg(1)
+    reg price correct checklist  refer time med
   binsreg price time checklist correct refer  med   ///
-    , polyreg(3)
+    , polyreg(1)
   binsreg price med correct checklist  refer time    ///
-    , polyreg(3)
+    , polyreg(1)
 
   binsreg price checklist  if price < 2000 & price > 0 , polyreg(3)
 
