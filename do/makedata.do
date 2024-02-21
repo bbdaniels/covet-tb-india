@@ -18,9 +18,13 @@ use "${dir}/data/constructed/sp-combined.dta" ///
   egen checklist = rowmean(sp?_h_*)
     lab var checklist "Checklist"
 
+    replace pid = fid if city == 1
+
   labelcollapse ///
     (mean) correct checklist ///
-    , by (city fidcode)
+    , by (city pid)
+
+    drop if pid == ""
 
     ren (correct checklist)(pre_correct pre_checklist)
 
@@ -34,10 +38,11 @@ use "${dir}/data/constructed/sp-combined.dta" ///
   egen checklist = rowmean(sp?_h_*)
     lab var checklist "Checklist"
 
-  merge m:1 city fidcode using `pre' , keep(1 3) nogen
-    egen uid = group(city fidcode)
-    lab var uid "Unique Facility ID"
-    drop fidcode
+    replace pid = fid if city == 1
+
+  merge m:1 city pid using `pre' ,  keep(1 3) nogen
+    egen uid = group(city pid)
+    lab var uid "Unique Provider ID"
 
   egen cov_screen = rowmax(cov_*)
     lab var cov_screen "Covid Screening"
