@@ -81,6 +81,8 @@ use "${dir}/data/constructed/sp-long.dta" if round < 4, clear
 // Figure 3
 use "${dir}/data/constructed/sp-covet.dta" , clear
 
+  drop if pid == ""
+
   lab def case 1 "Standard TB Case" 9 "Covid-Like Case" , replace
 
   ren cov_screen screen
@@ -90,14 +92,17 @@ use "${dir}/data/constructed/sp-covet.dta" , clear
   betterbarci ///
     ppe ppe_* mask_hi screen cov_* ///
     , over(city) legend(on pos(12) region(lc(none))) xlab(${pct}) xoverhang ysize(7) ///
-      barc(dkgreen gray) bar pct scale(0.7) vce(cluster uid) n
+      barc(dkgreen gray) bar pct scale(0.7) vce(cluster uid) n ///
+      note("Share of interactions ordering or offering {&rarr}")
 
       graph export "${dir}/output/f3-summary.pdf" , replace
 
 // Figure 4
 use "${dir}/data/constructed/sp-covet.dta" , clear
 
-  lab var pre_correct "100% increase in pre-Covid quality"
+  drop if pid == ""
+
+  lab var pre_correct "100% increase in 2014-19 quality"
   ren cov_screen screen
     lab var screen "Any Screening"
     lab var ppe "Any Safety"
