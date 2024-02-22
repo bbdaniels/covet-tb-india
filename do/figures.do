@@ -2,61 +2,60 @@
 
 // Figure 1
 
-use "${dir}/data/constructed/sp-long.dta" if round == 3, clear
+use "${dir}/data/constructed/sp-long.dta" if round < 4, clear
   append using "${dir}/data/constructed/sp-covet.dta"
 
-  gen type = 0
-    replace type = 1 if round == 4
-    replace type = 2 if case == 9
+  drop if pid == ""
+  bys pid: egen n1 = max(round)
+    keep if n1 == 4
 
-    replace test_cov = 0 if test_cov == .
 
-  betterbarci ///
-    correct test_cov test_cxr test_afb test_gx refer ///
-    med_anti_any_3 med_anti_any_2 med_code_any_9 ///
-  if city == 1 ///
-    , over(type) ///
-      xlab(${pct}) xoverhang ///
-      title("Patna") barc(navy%80 red gray) bar pct   ///
-      legend(on c(1) pos(12) region(lc(none)) ///
-             order(1 "Standard TB Case Presentation, 2018-19" ///
-                   2 "Standard TB Case Presentation, 2021-22" ///
-                   3 "Less-Specific TB Case Presentation, 2021-22"))
+    replace round = 5 if case == 9
+    lab def round ///
+          1 "2014-15 Standard TB Case Presentation" ///
+          2 "2016-17 Standard TB Case Presentation" ///
+          3 "2018-19 Standard TB Case Presentation" ///
+          4 "2021-22 Standard TB Case Presentation" ///
+          5 "2021-22 Less-Specific TB Case Presentation" , replace
 
-  graph save "${dir}/output/temp/bar-patna.gph" , replace
+          lab val round round
+
+  replace test_cov = 0 if test_cov == .
 
   betterbarci ///
     correct test_cov test_cxr test_afb test_gx refer ///
     med_anti_any_3 med_anti_any_2 med_code_any_9 ///
-  if city == 2 ///
-    , over(type) ///
-      xlab(${pct}) xoverhang ///
-      title("Mumbai") barc(navy%80 red gray) bar pct   ///
-      legend(on pos(12) region(lc(none)) ///
-             order(1 "Standard TB Case Presentation, 2018-19" ///
-                   2 "Standard TB Case Presentation, 2021-22" ///
-                   3 "Less-Specific TB Case Presentation, 2021-22"))
-
-  graph save "${dir}/output/temp/bar-mumbai.gph" , replace
-
-  grc1leg ///
-    "${dir}/output/temp/bar-patna.gph" ///
-    "${dir}/output/temp/bar-mumbai.gph"
-
-    graph draw
+    , over(round) ysize(7) scale(0.7) xtit("") n ///
+      xlab(${pct}) xoverhang note("Share of interactions ordering or offering {&rarr}") ///
+      barc(red black%70 black%50 black%30 black%10) bar pct   ///
+      legend(on c(1) pos(12) region(lc(none)))
 
   graph export "${dir}/output/f1-summary.pdf" , replace
 
 // Figure 2
-  use "${dir}/data/constructed/sp-long.dta" , clear
+  use "${dir}/data/constructed/sp-long.dta" if case == 1, clear
+
+  labelcollapse (mean) city correct test_cxr test_afb test_gx refer ///
+    med_anti_any_3 med_anti_any_2 med_code_any_9 , by(pid)
+
+    gen case = 1
+    gen round = 3
+
+    append using "${dir}/data/constructed/sp-covet.dta"
+    drop if pid == ""
+    bys pid: egen n1 = max(round)
+      keep if n1 == 4
+
+    encode pid , gen(uuid)
+    keep if case == 1
 
   forest reg ///
     (correct test_cxr test_afb test_gx refer ///
      med_anti_any_3 med_anti_any_2 med_code_any_9) ///
-  , t(4.round) c(i.city i.case) b bh sort(local) cl(fid) ///
-    graph(ysize(7) title("Standard TB Case Presentation, 2018-19 vs 2021-22", size(medium) pos(11) span) ///
+  , t(4.round) c(i.city) b bh sort(local) cl(uuid) ///
+    graph(ysize(7) title("2014-19 vs 2021-22; Standard TB Case Presentation Only", size(medium) pos(11) span) ///
           legend(off c(1) ring(0) pos(1)) xoverhang ///
-          xlab(${neg20}) xtitle("Percentage-Point Increase In 2021-22"))
+          xlab(${neg20}) xtitle("Percentage-Point Change In 2021-22"))
 
     graph save "${dir}/output/temp/reg-round.gph" , replace
 
@@ -65,10 +64,10 @@ use "${dir}/data/constructed/sp-long.dta" if round == 3, clear
   forest reg ///
     (correct test_cxr test_afb test_gx refer ///
      med_anti_any_3 med_anti_any_2 med_code_any_9) ///
-  , t(1.case) c(i.city) b bh sort(local) cl(fid) ///
-    graph(ysize(7) title("Standard vs Less-Specific TB Case Presentation, 2021-22", size(medium) pos(11) span) ///
+  , t(9.case) c(i.city) b bh sort(local) cl(fid) ///
+    graph(ysize(7) title("2021-22 Only; Standard vs Less-Specific TB Case Presentation", size(medium) pos(11) span) ///
           legend(off c(1) ring(0) pos(1)) xoverhang ///
-          xlab(${neg20})  xtit("Percentage-Point Increase In Standard Presentation"))
+          xlab(${neg20})  xtit("Percentage-Point Change In Less-Specific Presentation"))
 
     graph save "${dir}/output/temp/reg-case.gph" , replace
 

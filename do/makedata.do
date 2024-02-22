@@ -2,8 +2,11 @@
 
 // Create blended data
 use "${dir}/data/constructed/sp-combined.dta" ///
-  if case == 1 & round > 2 ///
+  if case == 1  ///
   , clear
+
+  replace pid = fid if city == 1
+  drop if pid == ""
 
   lab var correct "TB Test or Refer"
 
