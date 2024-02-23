@@ -6,9 +6,6 @@ use "${dir}/data/constructed/sp-long.dta" if round < 4, clear
   append using "${dir}/data/constructed/sp-covet.dta"
 
   drop if pid == ""
-  bys pid: egen n1 = max(round)
-    keep if n1 == 4
-
 
     replace round = 5 if case == 9
     lab def round ///
@@ -33,7 +30,7 @@ use "${dir}/data/constructed/sp-long.dta" if round < 4, clear
   graph export "${dir}/output/f1-summary.pdf" , replace
 
 // Figure 2
-  use "${dir}/data/constructed/sp-long.dta" if case == 1, clear
+  use "${dir}/data/constructed/sp-long.dta" if case == 1 & round == 3, clear
 
   labelcollapse (mean) city correct test_cxr test_afb test_gx refer ///
     med_anti_any_3 med_anti_any_2 med_code_any_9 , by(pid)
@@ -43,8 +40,6 @@ use "${dir}/data/constructed/sp-long.dta" if round < 4, clear
 
     append using "${dir}/data/constructed/sp-covet.dta"
     drop if pid == ""
-    bys pid: egen n1 = max(round)
-      keep if n1 == 4
 
     encode pid , gen(uuid)
     keep if case == 1
@@ -52,8 +47,8 @@ use "${dir}/data/constructed/sp-long.dta" if round < 4, clear
   forest reg ///
     (correct test_cxr test_afb test_gx refer ///
      med_anti_any_3 med_anti_any_2 med_code_any_9) ///
-  , t(4.round) c(i.city) b bh sort(local) cl(uuid) ///
-    graph(ysize(7) title("2014-19 vs 2021-22; Standard TB Case Presentation Only", size(medium) pos(11) span) ///
+  , rhs(4.round i.city) b bh sort(local) cl(uuid) ///
+    graph(ysize(7) title("2018-19 vs 2021-22; Standard TB Case Presentation Only", size(medium) pos(11) span) ///
           legend(off c(1) ring(0) pos(1)) xoverhang ///
           xlab(${neg20}) xtitle("Percentage-Point Change In 2021-22"))
 
@@ -64,7 +59,7 @@ use "${dir}/data/constructed/sp-long.dta" if round < 4, clear
   forest reg ///
     (correct test_cxr test_afb test_gx refer ///
      med_anti_any_3 med_anti_any_2 med_code_any_9) ///
-  , t(9.case) c(i.city) b bh sort(local) cl(fid) ///
+  , rhs(9.case i.city) b bh sort(local) cl(fid) ///
     graph(ysize(7) title("2021-22 Only; Standard vs Less-Specific TB Case Presentation", size(medium) pos(11) span) ///
           legend(off c(1) ring(0) pos(1)) xoverhang ///
           xlab(${neg20})  xtit("Percentage-Point Change In Less-Specific Presentation"))
@@ -74,7 +69,7 @@ use "${dir}/data/constructed/sp-long.dta" if round < 4, clear
   graph combine ///
     "${dir}/output/temp/reg-round.gph" ///
     "${dir}/output/temp/reg-case.gph" ///
-    , c(1) ysize(6) xcom
+    , c(1) ysize(6) xcom scale(0.9)
 
   graph export "${dir}/output/f2-differences.pdf" , replace
 
@@ -93,7 +88,7 @@ use "${dir}/data/constructed/sp-covet.dta" , clear
     ppe ppe_* mask_hi screen cov_* ///
     , over(city) legend(on pos(12) region(lc(none))) xlab(${pct}) xoverhang ysize(7) ///
       barc(dkgreen gray) bar pct scale(0.7) vce(cluster uid) n ///
-      note("Share of interactions ordering or offering {&rarr}")
+      note("Share of interactions ordering or offering {&rarr}") xtit("")
 
       graph export "${dir}/output/f3-summary.pdf" , replace
 
@@ -112,7 +107,7 @@ use "${dir}/data/constructed/sp-covet.dta" , clear
      med_anti_any_3 med_anti_any_2 med_code_any_9) ///
     (ppe_* mask_hi ) ///
     (cov_*) ///
-  , t(pre_correct) c(i.city i.case) b bh sort(local) cl(uid) ///
+  , rhs(pre_correct i.city i.case) b bh sort(local) cl(uid) ///
     graph(scale(0.7) ysize(7) ///
           legend(on c(1) ring(0) pos(1) ///
                  order(0 "[F1] Technical Quality" 0 "[F2] IPC Measures" 0 "[F3] Covid Screening")) ///
@@ -120,5 +115,23 @@ use "${dir}/data/constructed/sp-covet.dta" , clear
 
     graph export "${dir}/output/f4-impacts.pdf" , replace
 
+// Figure 5
 
-// End
+use "${dir}/data/constructed/sp-covet.dta" , clear
+
+  drop if pid == ""
+
+  lab var pre_correct "Provider's 2014-19 Quality"
+
+  tw ///
+    (histogram pre_correct , frac width(.1) fc(gs12) lw(none) barw(.09)) ///
+    (lowess correct pre_correct , lw(thick) lc(black)) ///
+    (lowess test_cov pre_correct , lw(thick) lc(black) lp(dash)) ///
+    (lowess ppe_3 pre_correct , lw(thick) lc(red) ) ///
+    (lowess ppe_1 pre_correct , lw(thick) lc(red) lp(dash)) ///
+    , ysize(5) by(city , imargin(*3) note("") legend(pos(12)))  ///
+      ylab(${pct}) xlab(${pct}) ytitle("Provider's 2021-22 Practice" "(Histogram Illustrates Distribution)") ///
+      legend(c(2) order(2 "TB Test or Refer" ///
+        4 "Provider Masked"  3 "Covid Test" 5 "Other Patients Masked"))
+
+        graph export "${dir}/output/f5-detail.pdf" , replace
