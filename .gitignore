@@ -54,6 +54,7 @@
 !/**/*.ado
 !/**/*.dtasig
 !/**/data/*.xlsx
+!/**/do/*.xlsx
 !/constructed/*.dta
 
 # R
